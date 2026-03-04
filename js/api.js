@@ -6,11 +6,11 @@ window.API = {
   get: async (endpoint) => {
     try {
       const res = await fetch(`${API_URL}${endpoint}`);
-      const text = await res.text(); // сначала как текст
+      const text = await res.text();
       try {
-        return JSON.parse(text); // пробуем распарсить
+        return JSON.parse(text);
       } catch {
-        return text; // если не JSON, возвращаем как есть
+        return text;
       }
     } catch (error) {
       console.error('API GET error:', error);
