@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plans — Найди компанию за 5 минут</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream:    #faf6ef;
+    --sand:     #f0e9da;
+    --warm:     #e8dfc8;
+    --orange:   #f4651e;
+    --orange2:  #ff8c42;
+    --mint:     #3ecfb4;
+    --mint2:    #5de2c9;
+    --dark:     #1a1612;
+    --text:     #2e2820;
+    --muted:    #8a7f72;
+    --card-bg:  rgba(255,255,255,0.72);
+    --blur:     blur(18px);
+    --shadow:   0 8px 40px rgba(100,70,30,0.10);
+    --radius:   20px;
+    --radius-lg:32px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Manrope', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── BLOBS ─── */
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .blob-orange { background: rgba(244,101,30,0.18); }
+  .blob-mint   { background: rgba(62,207,180,0.18); }
+  .blob-yellow { background: rgba(255,210,100,0.18); }
+
+  /* ─── HEADER ─── */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    backdrop-filter: var(--blur);
+    -webkit-backdrop-filter: var(--blur);
+    background: rgba(250,246,239,0.80);
+    border-bottom: 1px solid rgba(200,180,150,0.20);
+  }
+  .header-inner {
+    max-width: 1160px; margin: 0 auto;
+    padding: 0 24px;
+    height: 68px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+  }
+  .logo-icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--orange), var(--orange2));
+    border-radius: 12px;
+    display: grid; place-items: center;
+    font-size: 20px;
+    box-shadow: 0 4px 14px rgba(244,101,30,0.35);
+  }
+  .logo-text {
+    font-family: 'Dela Gothic One', sans-serif;
+    font-size: 22px; color: var(--dark);
+    letter-spacing: -0.5px;
+  }
+  .logo-text span { color: var(--orange); }
+
+  nav { display: flex; align-items: center; gap: 10px; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Manrope', sans-serif;
+    font-weight: 600; font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: none; cursor: pointer;
+    text-decoration: none;
+    transition: transform .18s, box-shadow .18s, background .18s;
+    white-space: nowrap;
+  }
+  .btn:active { transform: scale(0.96); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--orange), var(--orange2));
+    color: #fff;
+    box-shadow: 0 4px 18px rgba(244,101,30,0.38);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 6px 28px rgba(244,101,30,0.55);
+    transform: translateY(-2px);
+  }
+
+  .btn-ghost {
+    background: rgba(255,255,255,0.55);
+    border: 1.5px solid rgba(200,180,150,0.40);
+    color: var(--text);
+    backdrop-filter: var(--blur);
+  }
+  .btn-ghost:hover {
+    background: rgba(255,255,255,0.85);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(100,70,30,0.12);
+  }
+
+  .btn-mint {
+    background: linear-gradient(135deg, var(--mint), var(--mint2));
+    color: #fff;
+    box-shadow: 0 4px 18px rgba(62,207,180,0.38);
+  }
+  .btn-mint:hover {
+    box-shadow: 0 6px 28px rgba(62,207,180,0.55);
+    transform: translateY(-2px);
+  }
+
+  .btn-big {
+    font-size: 17px; padding: 16px 40px;
+    border-radius: 60px;
+  }
+
+  /* ─── HERO ─── */
+  #hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex; align-items: center;
+    overflow: hidden;
+    padding: 80px 24px 60px;
+  }
+  #hero .blob { position: absolute; }
+  #hero .blob:nth-child(1) { width:520px;height:520px;top:-100px;right:-80px; }
+  #hero .blob:nth-child(2) { width:380px;height:380px;bottom:0;left:-60px; }
+  #hero .blob:nth-child(3) { width:260px;height:260px;top:40%;left:30%; }
+
+  .hero-inner {
+    position: relative; z-index: 1;
+    max-width: 1160px; margin: 0 auto; width: 100%;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.68);
+    border: 1.5px solid rgba(244,101,30,0.22);
+    border-radius: 50px;
+    padding: 6px 14px; font-size: 13px; font-weight: 600;
+    color: var(--orange); margin-bottom: 24px;
+    backdrop-filter: var(--blur);
+    animation: fadeUp .7s ease both;
+  }
+  .badge-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--mint);
+    box-shadow: 0 0 0 3px rgba(62,207,180,0.25);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100%{ box-shadow: 0 0 0 3px rgba(62,207,180,0.25); }
+    50%{ box-shadow: 0 0 0 7px rgba(62,207,180,0.12); }
+  }
+
+  h1 {
+    font-family: 'Dela Gothic One', sans-serif;
+    font-size: clamp(38px,6vw,68px);
+    line-height: 1.08;
+    letter-spacing: -1.5px;
+    color: var(--dark);
+    animation: fadeUp .8s .1s ease both;
+  }
+  h1 .accent { color: var(--orange); }
+  h1 .accent-mint { color: var(--mint); }
+
+  .hero-sub {
+    font-size: 17px; line-height: 1.65;
+    color: var(--muted); max-width: 500px;
+    margin: 20px 0 36px;
+    animation: fadeUp .8s .2s ease both;
+  }
+
+  .hero-cta {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    animation: fadeUp .8s .3s ease both;
+  }
+  .hero-hint {
+    font-size: 13px; color: var(--muted); margin-top: 14px;
+    animation: fadeUp .8s .4s ease both;
+  }
+  .hero-hint span {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--mint); margin-right: 6px; vertical-align: middle;
+  }
+
+  /* ─── PHONE MOCKUP ─── */
+  .phone-wrap {
+    display: flex; justify-content: center; align-items: center;
+    animation: fadeUp .9s .15s ease both;
+  }
+  .phone {
+    width: 240px; height: 490px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 44px;
+    border: 2px solid rgba(200,180,150,0.35);
+    box-shadow: 0 30px 80px rgba(100,70,30,0.18), 0 0 0 8px rgba(255,255,255,0.5);
+    overflow: hidden;
+    position: relative;
+    backdrop-filter: var(--blur);
+  }
+  .phone-notch {
+    width: 100px; height: 28px;
+    background: var(--dark);
+    border-radius: 0 0 20px 20px;
+    margin: 0 auto;
+  }
+  .phone-status {
+    display: flex; justify-content: space-between;
+    padding: 6px 18px; font-size: 11px; font-weight: 600;
+    color: var(--muted);
+  }
+  /* map area */
+  .phone-map {
+    margin: 8px 12px;
+    height: 280px;
+    background: #e8e4da;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+  }
+  .map-road { position:absolute; background:rgba(255,255,255,0.6); border-radius:4px; }
+  .map-road.h { height:6px; left:0; right:0; }
+  .map-road.v { width:6px; top:0; bottom:0; }
+  .map-road.h1 { top:35%; }
+  .map-road.h2 { top:62%; }
+  .map-road.h3 { top:15%; }
+  .map-road.v1 { left:25%; }
+  .map-road.v2 { left:60%; }
+  .map-road.v3 { left:80%; }
+  .map-block { position:absolute; border-radius:6px; background:rgba(200,190,175,0.55); }
+
+  .map-pin {
+    position: absolute;
+    display: flex; align-items: center; gap: 5px;
+    background: #fff;
+    border-radius: 30px;
+    padding: 5px 9px 5px 6px;
+    font-size: 11px; font-weight: 700;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.14);
+    white-space: nowrap;
+    cursor: default;
+    animation: pinPop .5s ease both;
+    border: 1.5px solid rgba(200,180,150,0.3);
+  }
+  .map-pin .pip { width:8px;height:8px;border-radius:50%; flex-shrink:0; }
+  .map-pin.orange .pip { background:var(--orange); }
+  .map-pin.mint   .pip { background:var(--mint); }
+  .map-pin.purple .pip { background:#b39ddb; }
+  .map-pin.pin1{ top:22%; left:8%;  animation-delay:.3s; }
+  .map-pin.pin2{ top:50%; left:40%; animation-delay:.5s; }
+  .map-pin.pin3{ top:70%; left:14%; animation-delay:.7s; }
+  @keyframes pinPop{
+    from{opacity:0;transform:scale(0.6) translateY(8px);}
+    to{opacity:1;transform:scale(1) translateY(0);}
+  }
+
+  .phone-bottom {
+    padding: 10px 14px;
+  }
+  .phone-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: linear-gradient(135deg,var(--orange),var(--orange2));
+    color:#fff; border-radius:50px; padding:6px 14px;
+    font-size:12px; font-weight:700;
+    box-shadow:0 4px 14px rgba(244,101,30,0.35);
+  }
+  .phone-users {
+    display:flex; gap:4px; margin-top:10px; align-items:center;
+  }
+  .user-av {
+    width:28px;height:28px;border-radius:50%;border:2px solid #fff;
+    display:grid;place-items:center;font-size:13px;
+    margin-left:-8px;
+  }
+  .user-av:first-child{margin-left:0;}
+  .user-count {
+    font-size:12px;font-weight:600;color:var(--muted);margin-left:6px;
+  }
+
+  /* ─── SECTIONS ─── */
+  section { padding: 90px 24px; position: relative; overflow: hidden; }
+
+  .section-inner {
+    max-width: 1160px; margin: 0 auto;
+  }
+
+  .eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 2.5px;
+    text-transform: uppercase; color: var(--orange);
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    font-family: 'Dela Gothic One', sans-serif;
+    font-size: clamp(28px,4vw,48px);
+    letter-spacing: -1px;
+    color: var(--dark);
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+  h2 .ac { color: var(--orange); }
+  h2 .acm { color: var(--mint); }
+
+  .section-sub {
+    font-size: 16px; line-height: 1.7; color: var(--muted);
+    max-width: 540px; margin-bottom: 52px;
+  }
+
+  /* ─── HOW IT WORKS ─── */
+  #how {
+    background: linear-gradient(160deg, rgba(255,255,255,0.55) 0%, rgba(232,223,200,0.30) 100%);
+  }
+  #how::before {
+    content:'';position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse 60% 40% at 90% 10%, rgba(244,101,30,0.08) 0%,transparent 70%),
+      radial-gradient(ellipse 50% 50% at 5% 80%, rgba(62,207,180,0.08) 0%,transparent 70%);
+    pointer-events:none;
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 24px;
+    position: relative;
+    z-index:1;
+  }
+  .steps::before {
+    content:'';
+    position:absolute;
+    top: 48px; left: calc(16.6% + 24px); right: calc(16.6% + 24px);
+    height:2px;
+    background: linear-gradient(90deg, var(--orange), var(--mint));
+    border-radius:2px;
+    z-index:0;
+  }
+
+  .step-card {
+    background: var(--card-bg);
+    border: 1.5px solid rgba(200,180,150,0.30);
+    border-radius: var(--radius-lg);
+    padding: 36px 28px 30px;
+    position: relative;
+    backdrop-filter: var(--blur);
+    box-shadow: var(--shadow);
+    text-align: center;
+    opacity: 0; transform: translateY(30px);
+    transition: opacity .6s ease, transform .6s ease, box-shadow .2s;
+  }
+  .step-card.visible { opacity:1; transform:translateY(0); }
+  .step-card:hover { box-shadow: 0 16px 60px rgba(100,70,30,0.18); }
+
+  .step-num {
+    position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--orange), var(--orange2));
+    color: #fff; font-weight: 800; font-size: 15px;
+    display: grid; place-items: center;
+    box-shadow: 0 4px 12px rgba(244,101,30,0.38);
+  }
+
+  .step-icon {
+    width: 64px; height: 64px; border-radius: 20px;
+    display: grid; place-items: center; font-size: 26px;
+    margin: 0 auto 18px;
+  }
+  .step-icon.orange { background: rgba(244,101,30,0.12); }
+  .step-icon.mint   { background: rgba(62,207,180,0.12); }
+  .step-icon.purple { background: rgba(179,157,219,0.18); }
+
+  .step-card h3 {
+    font-family: 'Dela Gothic One', sans-serif;
+    font-size: 18px; margin-bottom: 10px; letter-spacing: -0.3px;
+    color: var(--dark);
+  }
+  .step-card p { font-size: 14px; line-height: 1.6; color: var(--muted); }
+
+  /* ─── MAP SECTION ─── */
+  #map-section {
+    background: var(--dark);
+    color: #fff;
+  }
+  #map-section .eyebrow { color: var(--mint2); }
+  #map-section h2 { color: #fff; }
+  #map-section .section-sub { color: rgba(255,255,255,0.55); }
+  #map-section::before {
+    content:'';position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(ellipse 50% 60% at 80% 50%, rgba(62,207,180,0.10) 0%,transparent 70%),
+      radial-gradient(ellipse 40% 40% at 10% 30%, rgba(244,101,30,0.10) 0%,transparent 70%);
+  }
+
+  .city-map {
+    position: relative;
+    width: 100%; height: 420px;
+    background: #22201a;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1.5px solid rgba(255,255,255,0.07);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.4);
+    animation: fadeUp .9s .2s ease both;
+  }
+
+  /* roads */
+  .cr { position:absolute; background:rgba(255,255,255,0.07); }
+  .cr.h{height:10px;left:0;right:0;border-radius:0;}
+  .cr.v{width:10px;top:0;bottom:0;border-radius:0;}
+  .cr.h1{top:20%;}
+  .cr.h2{top:42%;}
+  .cr.h3{top:65%;}
+  .cr.h4{top:80%;}
+  .cr.v1{left:18%;}
+  .cr.v2{left:40%;}
+  .cr.v3{left:62%;}
+  .cr.v4{left:82%;}
+
+  /* city blocks */
+  .cb { position:absolute; background:rgba(255,255,255,0.04); border-radius:6px; }
+
+  .city-pin {
+    position:absolute;
+    background:rgba(255,255,255,0.10);
+    border:1.5px solid rgba(255,255,255,0.15);
+    backdrop-filter:blur(12px);
+    border-radius:60px;
+    padding:10px 16px;
+    display:flex; align-items:center; gap:10px;
+    cursor:default;
+    /* FIX: transition only non-transform props — transform is owned by pinFloat animation */
+    transition: box-shadow .25s, filter .25s;
+    animation: pinFloat 4s ease-in-out infinite;
+  }
+  /* FIX: single :hover rule. No transform — avoids fighting pinFloat animation.
+     Use filter+box-shadow for hover feedback instead. */
+  .city-pin:hover {
+    animation-play-state: paused;
+    filter: brightness(1.18);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+  }
+  .city-pin.cp1{ top:18%;left:10%; animation-delay:0s;}
+  .city-pin.cp2{ top:44%;left:38%; animation-delay:1.3s;}
+  .city-pin.cp3{ top:60%;left:63%; animation-delay:2.6s;}
+
+  @keyframes pinFloat{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-8px);}
+  }
+
+  .cp-icon{font-size:22px;}
+  .cp-info{}
+  .cp-title{font-size:13px;font-weight:700;color:#fff;}
+  .cp-meta{font-size:11px;color:rgba(255,255,255,0.50);margin-top:2px;}
+  .cp-badge {
+    margin-left:auto;
+    background:rgba(62,207,180,0.18);
+    border:1px solid rgba(62,207,180,0.30);
+    color:var(--mint2);
+    border-radius:50px;
+    padding:3px 10px;
+    font-size:11px; font-weight:700;
+  }
+  .cp-badge.hot{
+    background:rgba(244,101,30,0.18);
+    border-color:rgba(244,101,30,0.30);
+    color:var(--orange2);
+  }
+
+  .map-legend {
+    display:flex;gap:20px;flex-wrap:wrap;margin-top:24px;
+  }
+  .legend-item{
+    display:flex;align-items:center;gap:8px;
+    font-size:13px;color:rgba(255,255,255,0.55);
+  }
+  .legend-dot{width:10px;height:10px;border-radius:50%;}
+
+  /* ─── AMBASSADOR ─── */
+  #ambassador {
+    background: linear-gradient(135deg, #fff8f3, #f0faf8);
+  }
+  .amb-card {
+    background: linear-gradient(135deg, var(--orange), var(--orange2) 50%, #ff6b35);
+    border-radius: var(--radius-lg);
+    padding: 60px 52px;
+    display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: center;
+    box-shadow: 0 20px 60px rgba(244,101,30,0.30);
+    position: relative; overflow: hidden;
+    opacity:0; transform:translateY(30px);
+    transition: opacity .7s, transform .7s;
+  }
+  .amb-card.visible{opacity:1;transform:translateY(0);}
+  .amb-card::before{
+    content:''; position:absolute;
+    width:350px;height:350px;border-radius:50%;
+    background:rgba(255,255,255,0.08);
+    right:-80px; top:-80px;pointer-events:none;
+  }
+  .amb-card::after{
+    content:''; position:absolute;
+    width:220px;height:220px;border-radius:50%;
+    background:rgba(255,255,255,0.06);
+    right:60px;bottom:-60px;pointer-events:none;
+  }
+  .amb-eyebrow{
+    font-size:12px;letter-spacing:2px;text-transform:uppercase;
+    font-weight:700;color:rgba(255,255,255,0.70);margin-bottom:12px;
+  }
+  .amb-card h2{color:#fff;margin-bottom:14px;}
+  .amb-card p{color:rgba(255,255,255,0.80);font-size:16px;line-height:1.7;}
+  .amb-perks{
+    display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;
+  }
+  .perk{
+    background:rgba(255,255,255,0.18);
+    border:1px solid rgba(255,255,255,0.22);
+    border-radius:50px;padding:6px 14px;
+    font-size:13px;font-weight:600;color:#fff;
+  }
+  .btn-white{
+    background:#fff;color:var(--orange);
+    font-weight:700;
+    box-shadow:0 4px 18px rgba(0,0,0,0.12);
+    flex-shrink:0;
+  }
+  .btn-white:hover{
+    box-shadow:0 8px 32px rgba(0,0,0,0.18);
+    transform:translateY(-2px);
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--dark);
+    color: rgba(255,255,255,0.55);
+    padding: 52px 24px 32px;
+  }
+  .footer-inner {
+    max-width:1160px;margin:0 auto;
+    display:grid;grid-template-columns:1fr auto;gap:40px;align-items:start;
+  }
+  .footer-logo .logo-text{color:#fff;}
+  .footer-tagline{font-size:13px;margin-top:8px;line-height:1.6;max-width:260px;}
+  .footer-links{
+    display:flex;gap:32px;flex-wrap:wrap;margin-top:32px;
+    font-size:13px;
+  }
+  .footer-links a{color:rgba(255,255,255,0.50);text-decoration:none;transition:color .2s;}
+  .footer-links a:hover{color:#fff;}
+  .footer-right{text-align:right;}
+  .footer-socials{
+    display:flex;gap:12px;justify-content:flex-end;
+  }
+  .soc-btn{
+    width:40px;height:40px;border-radius:12px;
+    background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.10);
+    display:grid;place-items:center;font-size:16px;
+    color:rgba(255,255,255,0.55);text-decoration:none;
+    transition:background .2s,color .2s,transform .2s;
+  }
+  .soc-btn:hover{background:rgba(255,255,255,0.14);color:#fff;transform:translateY(-2px);}
+  .footer-copy{font-size:12px;margin-top:14px;color:rgba(255,255,255,0.28);}
+  .footer-divider{
+    max-width:1160px;margin:32px auto 0;
+    border:none;border-top:1px solid rgba(255,255,255,0.07);
+  }
+  .footer-bottom{
+    max-width:1160px;margin:16px auto 0;
+    font-size:12px;color:rgba(255,255,255,0.25);
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp{
+    from{opacity:0;transform:translateY(24px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media(max-width:900px){
+    .hero-inner{ grid-template-columns:1fr; gap:40px; }
+    .phone-wrap{ order:-1; }
+    .phone{ width:200px;height:400px; }
+    .steps{ grid-template-columns:1fr; }
+    .steps::before{ display:none; }
+    .amb-card{ grid-template-columns:1fr; }
+    .amb-card .btn-white{ align-self:flex-start; }
+    .footer-inner{ grid-template-columns:1fr; }
+    .footer-right{text-align:left;}
+    .footer-socials{justify-content:flex-start;}
+    .city-pin.cp3{ left:55%; top:70%; }
+  }
+  @media(max-width:600px){
+    .header-inner{ padding:0 16px; }
+    nav .btn-ghost{ display:none; }
+    section{ padding:60px 16px; }
+    .amb-card{ padding:36px 24px; }
+    h1{ letter-spacing:-1px; }
+    .city-map{ height:320px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="#" class="logo">
+      <div class="logo-icon">☕</div>
+      <span class="logo-text">Pl<span>a</span>ns</span>
+    </a>
+    <nav>
+      <a href="#" class="btn btn-ghost"><i class="fab fa-telegram"></i> Telegram</a>
+      <a href="#" class="btn btn-primary"><i class="fa-solid fa-download"></i> Скачать</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="blob blob-orange" style="width:500px;height:500px;top:-120px;right:-100px;"></div>
+  <div class="blob blob-mint"   style="width:360px;height:360px;bottom:-60px;left:-80px;"></div>
+  <div class="blob blob-yellow" style="width:280px;height:280px;top:45%;left:35%;"></div>
+
+  <div class="hero-inner">
+    <div>
+      <div class="hero-badge">
+        <div class="badge-dot"></div>
+        Открыт бета-тест
+      </div>
+      <h1>Найди компанию<br>за <span class="accent">5 минут</span></h1>
+      <p class="hero-sub">
+        Не хочешь сидеть дома? Посмотри, кто рядом пьёт кофе, гуляет в парке или ищет напарника для настолок. Присоединяйся к живым встречам без обязательств.
+      </p>
+      <div class="hero-cta">
+        <a href="#" class="btn btn-primary btn-big">
+          <i class="fa-solid fa-rocket"></i>
+          Присоединиться к бета-тесту
+        </a>
+      </div>
+      <p class="hero-hint"><span></span>Скоро в твоём городе</p>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-status">
+          <span>9:41</span>
+          <span><i class="fa-solid fa-signal" style="margin-right:4px;font-size:10px;"></i><i class="fa-solid fa-battery-three-quarters" style="font-size:10px;"></i></span>
+        </div>
+        <div class="phone-map">
+          <!-- Roads -->
+          <div class="map-road h h1"></div>
+          <div class="map-road h h2"></div>
+          <div class="map-road h h3"></div>
+          <div class="map-road v v1"></div>
+          <div class="map-road v v2"></div>
+          <div class="map-road v v3"></div>
+          <!-- Blocks -->
+          <div class="map-block" style="top:5%;left:30%;width:28%;height:22%;"></div>
+          <div class="map-block" style="top:42%;left:65%;width:30%;height:16%;"></div>
+          <div class="map-block" style="top:68%;left:30%;width:25%;height:20%;"></div>
+          <div class="map-block" style="top:5%;left:65%;width:22%;height:22%;"></div>
+          <!-- Pins -->
+          <div class="map-pin orange pin1"><div class="pip"></div>☕ 3 чел.</div>
+          <div class="map-pin mint pin2"><div class="pip"></div>🎲 2 чел.</div>
+          <div class="map-pin purple pin3"><div class="pip"></div>🚶 1 чел.</div>
+        </div>
+        <div class="phone-bottom">
+          <div class="phone-chip">
+            <i class="fa-solid fa-location-dot"></i> 3 встречи рядом
+          </div>
+          <div class="phone-users">
+            <div class="user-av" style="background:#fde8d4;">😊</div>
+            <div class="user-av" style="background:#d4f5ee;">😄</div>
+            <div class="user-av" style="background:#e8d4f5;">🙂</div>
+            <div class="user-av" style="background:#d4e8f5;">😎</div>
+            <span class="user-count">+24 онлайн</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="section-inner">
+    <p class="eyebrow">Как это работает</p>
+    <h2>Три шага до<br><span class="ac">новых знакомств</span></h2>
+    <p class="section-sub">Никаких анкет и долгих переписок. Просто открой карту и смотри, кто рядом.</p>
+
+    <div class="steps">
+      <div class="step-card" data-anim>
+        <div class="step-num">1</div>
+        <div class="step-icon orange">📍</div>
+        <h3>Отметься на карте</h3>
+        <p>Укажи, где ты сейчас и что хочешь делать. Твоя точка появится на карте для всех вокруг.</p>
+      </div>
+      <div class="step-card" data-anim data-delay="120">
+        <div class="step-num">2</div>
+        <div class="step-icon mint">🎯</div>
+        <h3>Выбери занятие</h3>
+        <p>Кофе и разговоры, прогулка, кино, настолки или любой другой формат — ты решаешь.</p>
+      </div>
+      <div class="step-card" data-anim data-delay="240">
+        <div class="step-num">3</div>
+        <div class="step-icon purple">🤝</div>
+        <h3>Встречайся</h3>
+        <p>Кто-то откликнулся — пора встречаться. Живое общение без обязательств и стресса.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP SECTION -->
+<section id="map-section">
+  <div class="section-inner" style="position:relative;z-index:1;">
+    <p class="eyebrow">Живая карта</p>
+    <h2>Что происходит <span class="acm">рядом?</span></h2>
+    <p class="section-sub">Открой приложение и увидишь, кто сейчас ищет компанию в твоём районе.</p>
+
+    <div class="city-map">
+      <!-- Grid roads -->
+      <div class="cr h h1"></div><div class="cr h h2"></div>
+      <div class="cr h h3"></div><div class="cr h h4"></div>
+      <div class="cr v v1"></div><div class="cr v v2"></div>
+      <div class="cr v v3"></div><div class="cr v v4"></div>
+      <!-- Blocks -->
+      <div class="cb" style="top:4%;left:1%;width:16%;height:14%;"></div>
+      <div class="cb" style="top:4%;left:20%;width:18%;height:14%;"></div>
+      <div class="cb" style="top:4%;left:42%;width:18%;height:14%;"></div>
+      <div class="cb" style="top:4%;left:64%;width:16%;height:14%;"></div>
+      <div class="cb" style="top:24%;left:1%;width:16%;height:16%;"></div>
+      <div class="cb" style="top:24%;left:20%;width:18%;height:16%;"></div>
+      <div class="cb" style="top:24%;left:64%;width:16%;height:16%;"></div>
+      <div class="cb" style="top:46%;left:1%;width:16%;height:16%;"></div>
+      <div class="cb" style="top:46%;left:42%;width:18%;height:13%;"></div>
+      <div class="cb" style="top:46%;left:64%;width:16%;height:13%;"></div>
+      <div class="cb" style="top:70%;left:20%;width:58%;height:22%;"></div>
+      <div class="cb" style="top:70%;left:1%;width:16%;height:22%;"></div>
+      <div class="cb" style="top:70%;left:82%;width:16%;height:22%;"></div>
+
+      <!-- Pins -->
+      <div class="city-pin cp1">
+        <span class="cp-icon">☕</span>
+        <div class="cp-info">
+          <div class="cp-title">Кофе в Surf</div>
+          <div class="cp-meta">3 человека · через 20 мин</div>
+        </div>
+        <span class="cp-badge hot">Горячо</span>
+      </div>
+
+      <div class="city-pin cp2">
+        <span class="cp-icon">🎲</span>
+        <div class="cp-info">
+          <div class="cp-title">Настолки</div>
+          <div class="cp-meta">2 чел. · ищут 4-го</div>
+        </div>
+        <span class="cp-badge">Открыто</span>
+      </div>
+
+      <div class="city-pin cp3">
+        <span class="cp-icon">🚶</span>
+        <div class="cp-info">
+          <div class="cp-title">Прогулка</div>
+          <div class="cp-meta">1 человек · старт через час</div>
+        </div>
+        <span class="cp-badge">Скоро</span>
+      </div>
+    </div>
+
+    <div class="map-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--orange2);"></div>Горячие встречи</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--mint);"></div>Открытые</div>
+      <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,0.3);"></div>Запланированные</div>
+    </div>
+  </div>
+</section>
+
+<!-- AMBASSADOR -->
+<section id="ambassador">
+  <div class="section-inner">
+    <div class="amb-card" data-anim>
+      <div>
+        <p class="amb-eyebrow">Для организаторов</p>
+        <h2 style="letter-spacing:-1px;">Хочешь стать<br>амбассадором?</h2>
+        <p>Создавай свои встречи, получай скидки в кафе и повышай рейтинг. Стань лицом своего района и собирай команду единомышленников.</p>
+        <div class="amb-perks">
+          <span class="perk">☕ Скидки в кафе</span>
+          <span class="perk">⭐ Рейтинг</span>
+          <span class="perk">🎉 Свои события</span>
+          <span class="perk">🏅 Значки</span>
+        </div>
+      </div>
+      <a href="#" class="btn btn-white btn-big">
+        Заполнить анкету <i class="fa-solid fa-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <a href="#" class="logo footer-logo">
+        <div class="logo-icon">☕</div>
+        <span class="logo-text">Pl<span>a</span>ns</span>
+      </a>
+      <p class="footer-tagline">Живые встречи без обязательств. Просто открой карту и посмотри, кто рядом.</p>
+      <div class="footer-links">
+        <a href="#">О проекте</a>
+        <a href="#">Блог</a>
+        <a href="#">Поддержка</a>
+        <a href="#">Политика конфиденциальности</a>
+      </div>
+    </div>
+    <div class="footer-right">
+      <div class="footer-socials">
+        <a href="#" class="soc-btn" title="Telegram"><i class="fab fa-telegram"></i></a>
+        <a href="#" class="soc-btn" title="VK"><i class="fab fa-vk"></i></a>
+        <a href="#" class="soc-btn" title="Instagram"><i class="fab fa-instagram"></i></a>
+      </div>
+      <p class="footer-copy">plans.app</p>
+    </div>
+  </div>
+  <hr class="footer-divider">
+  <p class="footer-bottom">© 2025 Plans. Сделано с ☕ и любовью к живому общению.</p>
+</footer>
+
+<script>
+  // Scroll animation — single observer handles all animated elements
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const delay = parseInt(e.target.dataset.delay || 0);
+        setTimeout(() => e.target.classList.add('visible'), delay);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('[data-anim]').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
