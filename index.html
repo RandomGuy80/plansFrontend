@@ -986,6 +986,7 @@
  
 <script src="js/api.js"></script>
 <script>
+document.addEventListener('DOMContentLoaded', function() {
   // ── Modal open/close ──────────────────────────────────────
   const overlay  = document.getElementById('modal');
   const btnClose = document.getElementById('modal-close');
@@ -1086,6 +1087,8 @@
     emailError.classList.add('show');
     emailInput.classList.add('error');
   }
+
+}); // end DOMContentLoaded
 </script>
  
 
@@ -1131,4 +1134,3 @@
 
 </body>
 </html>
-
