@@ -619,6 +619,125 @@
     h1{ letter-spacing:-1px; }
     .city-map{ height:320px; }
   }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(26,22,18,0.72);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s ease;
+  }
+  .modal-overlay.open {
+    opacity: 1; pointer-events: all;
+  }
+  .modal {
+    background: var(--cream);
+    border-radius: var(--radius-lg);
+    padding: 48px 40px 40px;
+    width: 100%; max-width: 480px;
+    position: relative;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.25);
+    transform: translateY(20px) scale(0.97);
+    transition: transform .28s ease;
+  }
+  .modal-overlay.open .modal {
+    transform: translateY(0) scale(1);
+  }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(0,0,0,0.06); border: none; cursor: pointer;
+    display: grid; place-items: center; font-size: 18px; color: var(--muted);
+    transition: background .18s, color .18s;
+  }
+  .modal-close:hover { background: rgba(0,0,0,0.12); color: var(--dark); }
+
+  .modal-icon {
+    width: 56px; height: 56px; border-radius: 18px;
+    background: linear-gradient(135deg, var(--orange), var(--orange2));
+    display: grid; place-items: center; font-size: 26px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 24px rgba(244,101,30,0.35);
+  }
+  .modal h3 {
+    font-family: 'Dela Gothic One', sans-serif;
+    font-size: 26px; letter-spacing: -0.5px;
+    color: var(--dark); margin-bottom: 8px;
+  }
+  .modal-sub {
+    font-size: 15px; color: var(--muted); line-height: 1.6;
+    margin-bottom: 28px;
+  }
+
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block; font-size: 13px; font-weight: 600;
+    color: var(--text); margin-bottom: 6px;
+  }
+  .field input {
+    width: 100%; padding: 13px 16px;
+    border: 1.5px solid rgba(200,180,150,0.45);
+    border-radius: 14px; font-family: 'Manrope', sans-serif;
+    font-size: 15px; color: var(--dark);
+    background: rgba(255,255,255,0.85);
+    outline: none;
+    transition: border-color .18s, box-shadow .18s;
+  }
+  .field input:focus {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(244,101,30,0.12);
+  }
+  .field input.error {
+    border-color: #e55;
+    box-shadow: 0 0 0 3px rgba(220,50,50,0.10);
+  }
+  .field-error {
+    font-size: 12px; color: #d44; margin-top: 5px;
+    display: none;
+  }
+  .field-error.show { display: block; }
+
+  .modal-submit {
+    width: 100%; margin-top: 8px;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--orange), var(--orange2));
+    color: #fff; font-family: 'Manrope', sans-serif;
+    font-size: 16px; font-weight: 700;
+    border: none; border-radius: 50px; cursor: pointer;
+    box-shadow: 0 4px 18px rgba(244,101,30,0.38);
+    transition: box-shadow .18s, transform .18s, opacity .18s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .modal-submit:hover:not(:disabled) {
+    box-shadow: 0 6px 28px rgba(244,101,30,0.55);
+    transform: translateY(-1px);
+  }
+  .modal-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+  /* Success state */
+  .modal-success {
+    display: none; text-align: center; padding: 12px 0;
+  }
+  .modal-success.show { display: block; }
+  .modal-form.hide { display: none; }
+  .success-icon {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--mint), var(--mint2));
+    display: grid; place-items: center; font-size: 30px;
+    margin: 0 auto 20px;
+    box-shadow: 0 8px 24px rgba(62,207,180,0.35);
+  }
+  .modal-success h3 { color: var(--dark); margin-bottom: 10px; }
+  .modal-success p { color: var(--muted); font-size: 15px; line-height: 1.6; }
+
+  @media (max-width: 600px) {
+    .modal { padding: 36px 24px 28px; }
+    .modal h3 { font-size: 22px; }
+  }
+
 </style>
 </head>
 <body>
@@ -867,8 +986,149 @@
  
 <script src="js/api.js"></script>
 <script>
-  API.get('/api/users').then(data => console.log(data));
+  // ── Modal open/close ──────────────────────────────────────
+  const overlay  = document.getElementById('modal');
+  const btnClose = document.getElementById('modal-close');
+
+  function openModal() {
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => document.getElementById('input-email').focus(), 50);
+  }
+
+  function closeModal() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Close on overlay click (but not on modal card itself)
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+  btnClose.addEventListener('click', closeModal);
+
+  // Close on Escape
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // ── Wire ALL CTA buttons to open the modal ────────────────
+  document.querySelectorAll('.btn-primary, .btn-white').forEach(btn => {
+    // Skip buttons that have a real href (Telegram etc.) — only plain # links
+    if (btn.getAttribute('href') === '#' || btn.tagName === 'BUTTON') {
+      btn.addEventListener('click', e => { e.preventDefault(); openModal(); });
+    }
+  });
+
+  // ── Form submission ───────────────────────────────────────
+  const emailInput  = document.getElementById('input-email');
+  const cityInput   = document.getElementById('input-city');
+  const emailError  = document.getElementById('error-email');
+  const submitBtn   = document.getElementById('modal-submit');
+  const submitText  = document.getElementById('submit-text');
+  const modalForm   = document.getElementById('modal-form');
+  const modalSuccess = document.getElementById('modal-success');
+
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  function validateEmail() {
+    const ok = emailRe.test(emailInput.value.trim());
+    emailInput.classList.toggle('error', !ok);
+    emailError.classList.toggle('show', !ok);
+    return ok;
+  }
+
+  emailInput.addEventListener('blur', validateEmail);
+  emailInput.addEventListener('input', () => {
+    // Clear error while user is typing after a failed attempt
+    if (emailInput.classList.contains('error')) validateEmail();
+  });
+
+  // Enter key submits
+  emailInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleSubmit(); });
+  cityInput.addEventListener('keydown',  e => { if (e.key === 'Enter') handleSubmit(); });
+
+  submitBtn.addEventListener('click', handleSubmit);
+
+  async function handleSubmit() {
+    if (!validateEmail()) return;
+
+    const email = emailInput.value.trim().toLowerCase();
+    const city  = cityInput.value.trim();
+
+    // Loading state
+    submitBtn.disabled = true;
+    submitText.textContent = 'Отправляем...';
+
+    try {
+      const res = await API.post('/api/subscribe', { email, city });
+
+      if (res && res.error) {
+        // Handle known server errors gracefully
+        if (res.error.includes('already subscribed')) {
+          showServerError('Этот email уже в списке 👍');
+        } else {
+          showServerError(res.error);
+        }
+        return;
+      }
+
+      // Success!
+      modalForm.classList.add('hide');
+      modalSuccess.classList.add('show');
+
+    } catch (err) {
+      showServerError('Что-то пошло не так. Попробуй ещё раз.');
+    } finally {
+      submitBtn.disabled = false;
+      submitText.textContent = 'Присоединиться';
+    }
+  }
+
+  function showServerError(msg) {
+    emailError.textContent = msg;
+    emailError.classList.add('show');
+    emailInput.classList.add('error');
+  }
 </script>
  
+
+<!-- SUBSCRIBE MODAL -->
+<div class="modal-overlay" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <button class="modal-close" id="modal-close" aria-label="Закрыть">✕</button>
+
+    <!-- Form state -->
+    <div class="modal-form" id="modal-form">
+      <div class="modal-icon">🚀</div>
+      <h3 id="modal-title">Войти в бета-тест</h3>
+      <p class="modal-sub">Оставь email — напишем когда Plans запустится в твоём городе.</p>
+
+      <div class="field">
+        <label for="input-email">Email</label>
+        <input type="email" id="input-email" placeholder="you@example.com" autocomplete="email">
+        <div class="field-error" id="error-email">Введи корректный email</div>
+      </div>
+
+      <div class="field">
+        <label for="input-city">Город <span style="color:var(--muted);font-weight:400">(необязательно)</span></label>
+        <input type="text" id="input-city" placeholder="Москва, Алматы, Ташкент...">
+      </div>
+
+      <button class="modal-submit" id="modal-submit">
+        <i class="fa-solid fa-rocket"></i>
+        <span id="submit-text">Присоединиться</span>
+      </button>
+    </div>
+
+    <!-- Success state -->
+    <div class="modal-success" id="modal-success">
+      <div class="success-icon">✓</div>
+      <h3>Ты в списке!</h3>
+      <p>Как только Plans появится в твоём городе — мы напишем первым. Следи за обновлениями в Telegram.</p>
+      <a href="#" class="btn btn-primary" style="margin-top:24px;width:100%;justify-content:center;">
+        <i class="fab fa-telegram"></i> Подписаться на Telegram
+      </a>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
+
